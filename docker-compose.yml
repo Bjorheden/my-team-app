@@ -1,0 +1,96 @@
+x-env-file: &env-file
+  env_file:
+    - .env
+
+# ─── Shared network ───────────────────────────────────────────────────────────
+networks:
+  myteams:
+    driver: bridge
+
+# ─── Named volumes ────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+  redis_data:
+
+services:
+  # ── Postgres ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    <<: *env-file
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - myteams
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-myteams}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Redis ─────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - myteams
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Backend API ───────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    <<: *env-file
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-myteams}:${POSTGRES_PASSWORD:-myteams_secret}@postgres:5432/${POSTGRES_DB:-myteams}
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - myteams
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             python -m app.db.seed &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # ── Worker ────────────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+      target: development
+    <<: *env-file
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-myteams}:${POSTGRES_PASSWORD:-myteams_secret}@postgres:5432/${POSTGRES_DB:-myteams}
+      REDIS_URL: redis://redis:6379/0
+      # Add backend package to PYTHONPATH so the worker can import shared DB models
+      PYTHONPATH: /backend
+    volumes:
+      - ./worker:/app
+      - ./backend:/backend
+    networks:
+      - myteams
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: python -m app.main

@@ -1,0 +1,132 @@
+name: Mobile CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile.yml"
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  install:
+    name: Install dependencies
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache node_modules
+        uses: actions/cache/save@v4
+        with:
+          path: mobile/node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('mobile/package-lock.json') }}
+
+  typecheck:
+    name: TypeScript type check
+    runs-on: ubuntu-latest
+    needs: install
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: mobile/node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('mobile/package-lock.json') }}
+          fail-on-cache-miss: true
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+  lint:
+    name: Expo lint
+    runs-on: ubuntu-latest
+    needs: install
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: mobile/node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('mobile/package-lock.json') }}
+          fail-on-cache-miss: true
+
+      - name: Run Expo lint
+        run: npx expo lint
+
+  test:
+    name: Jest tests
+    runs-on: ubuntu-latest
+    needs: install
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: mobile/node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('mobile/package-lock.json') }}
+          fail-on-cache-miss: true
+
+      - name: Run tests
+        run: npx jest --passWithNoTests --coverage
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          file: mobile/coverage/coverage-final.json
+          flags: mobile
+        continue-on-error: true

@@ -1,0 +1,12 @@
+# ruff configuration for the worker package — mirrors backend settings
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "TCH", "ANN"]
+ignore = ["ANN101", "ANN102", "ANN401"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/tests/**" = ["ANN", "S101"]

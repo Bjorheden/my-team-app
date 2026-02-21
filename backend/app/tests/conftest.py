@@ -2,17 +2,13 @@
 
 from __future__ import annotations
 
-import asyncio
 from collections.abc import AsyncGenerator
-from typing import Any
 
 import pytest
 import pytest_asyncio
-from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.core.config import get_settings
 from app.db.models import Base
 from app.db.session import get_db
 from app.main import app as fastapi_app

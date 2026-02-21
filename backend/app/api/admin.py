@@ -44,8 +44,9 @@ async def trigger_sync(
         log.info("Admin sync: fixtures complete", teams=len(teams))
 
     elif body.scope == "events":
-        from app.db.models import Fixture
         from datetime import UTC, datetime, timedelta
+
+        from app.db.models import Fixture
 
         now = datetime.now(UTC)
         result = await db.execute(

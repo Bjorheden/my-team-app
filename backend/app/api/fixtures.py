@@ -9,11 +9,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.db.models import Event, Fixture, Team
-from app.db.session import get_db
-from app.schemas.fixtures import EventOut, FixtureDetailOut, FixtureOut
-from app.schemas.common import PaginatedResponse
 from app.core.security import get_current_user_id
+from app.db.models import Event, Fixture
+from app.db.session import get_db
+from app.schemas.common import PaginatedResponse
+from app.schemas.fixtures import EventOut, FixtureDetailOut, FixtureOut
 
 router = APIRouter(tags=["fixtures"])
 

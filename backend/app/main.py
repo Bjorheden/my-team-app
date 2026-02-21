@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
+from app.api import admin, auth, catalog, fixtures, health, me, standings
 from app.core.config import get_settings
 from app.core.errors import generic_exception_handler, validation_exception_handler
 from app.core.logging import RequestIDMiddleware, configure_logging
-from app.api import admin, auth, catalog, fixtures, health, me, standings
 
 configure_logging()
 settings = get_settings()

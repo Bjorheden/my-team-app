@@ -9,10 +9,8 @@ Usage (inside Docker):
 from __future__ import annotations
 
 import asyncio
-import uuid
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from app.core.logging import configure_logging, get_logger
@@ -148,15 +146,21 @@ FIXTURES = [
 ]
 
 STANDINGS_PL = [
-    {"rank": 1, "team_id": "team-mci", "played": 28, "wins": 20, "draws": 4, "losses": 4, "goals_for": 65, "goals_against": 28, "goal_diff": 37, "points": 64},
-    {"rank": 2, "team_id": "team-liv", "played": 28, "wins": 19, "draws": 5, "losses": 4, "goals_for": 60, "goals_against": 30, "goal_diff": 30, "points": 62},
-    {"rank": 3, "team_id": "team-ars", "played": 28, "wins": 18, "draws": 4, "losses": 6, "goals_for": 55, "goals_against": 32, "goal_diff": 23, "points": 58},
+    {"rank": 1, "team_id": "team-mci", "played": 28, "wins": 20, "draws": 4,
+     "losses": 4, "goals_for": 65, "goals_against": 28, "goal_diff": 37, "points": 64},
+    {"rank": 2, "team_id": "team-liv", "played": 28, "wins": 19, "draws": 5,
+     "losses": 4, "goals_for": 60, "goals_against": 30, "goal_diff": 30, "points": 62},
+    {"rank": 3, "team_id": "team-ars", "played": 28, "wins": 18, "draws": 4,
+     "losses": 6, "goals_for": 55, "goals_against": 32, "goal_diff": 23, "points": 58},
 ]
 
 STANDINGS_LL = [
-    {"rank": 1, "team_id": "team-rma", "played": 27, "wins": 21, "draws": 3, "losses": 3, "goals_for": 70, "goals_against": 25, "goal_diff": 45, "points": 66},
-    {"rank": 2, "team_id": "team-bar", "played": 27, "wins": 18, "draws": 4, "losses": 5, "goals_for": 58, "goals_against": 32, "goal_diff": 26, "points": 58},
-    {"rank": 3, "team_id": "team-atm", "played": 27, "wins": 16, "draws": 5, "losses": 6, "goals_for": 48, "goals_against": 28, "goal_diff": 20, "points": 53},
+    {"rank": 1, "team_id": "team-rma", "played": 27, "wins": 21, "draws": 3,
+     "losses": 3, "goals_for": 70, "goals_against": 25, "goal_diff": 45, "points": 66},
+    {"rank": 2, "team_id": "team-bar", "played": 27, "wins": 18, "draws": 4,
+     "losses": 5, "goals_for": 58, "goals_against": 32, "goal_diff": 26, "points": 58},
+    {"rank": 3, "team_id": "team-atm", "played": 27, "wins": 16, "draws": 5,
+     "losses": 6, "goals_for": 48, "goals_against": 28, "goal_diff": 20, "points": 53},
 ]
 
 

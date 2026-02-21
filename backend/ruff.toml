@@ -1,5 +1,5 @@
 target-version = "py312"
-line-length = 100
+line-length = 120
 
 [lint]
 select = [
@@ -16,16 +16,20 @@ select = [
     "RUF", # ruff-specific
 ]
 ignore = [
-    "ANN101", # missing type annotation for self
-    "ANN102", # missing type annotation for cls
+    "ANN401", # typing.Any allowed in helpers
+    "B008",   # Depends() in defaults - standard FastAPI pattern
+    "RUF002", # en-dash in docstrings - cosmetic
+    "RUF003", # en-dash in comments - cosmetic
     "S101",   # use of assert (fine in tests)
     "S105",   # hardcoded password string (false positives)
     "S106",   # hardcoded password function arg
+    "UP046",  # Generic[T] syntax - Pydantic compatibility
 ]
 
 [lint.per-file-ignores]
 "app/tests/**" = ["S101", "ANN", "S106"]
 "app/db/seed.py" = ["S106", "ANN"]
+"alembic/**" = ["I001", "F401", "RUF100", "ANN"]
 
 [format]
 quote-style = "double"

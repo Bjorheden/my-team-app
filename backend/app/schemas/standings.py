@@ -34,8 +34,8 @@ class DashboardTeamEntry(BaseModel):
 
     team: TeamOut
     standing: StandingOut | None
-    next_fixture: "FixtureBrief | None"
-    last_fixture: "FixtureBrief | None"
+    next_fixture: FixtureBrief | None
+    last_fixture: FixtureBrief | None
 
 
 class FixtureBrief(BaseModel):

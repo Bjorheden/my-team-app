@@ -58,3 +58,19 @@ plugins = ["pydantic.mypy"]
 [tool.coverage.run]
 source = ["app"]
 omit = ["app/tests/*", "app/db/seed.py"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]
+ignore = [
+    "B008",    # Depends() in function defaults — standard FastAPI pattern
+    "ANN401",  # typing.Any is acceptable in cache/logger helpers
+    "RUF002",  # en-dash in docstrings — cosmetic
+    "RUF003",  # en-dash in comments — cosmetic
+]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/*" = ["I001", "F401", "RUF100"]
+"app/tests/*" = ["F401"]

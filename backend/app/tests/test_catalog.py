@@ -10,7 +10,6 @@ from app.db.models import League, Team
 
 
 async def _seed_league_and_team(db: AsyncSession) -> tuple[League, Team]:
-    from datetime import UTC, datetime
 
     league = League(
         id="test-league-1",

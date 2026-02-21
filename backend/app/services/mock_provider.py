@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from typing import ClassVar
 
 from app.services.provider import (
     FootballProvider,
@@ -19,12 +20,12 @@ _NOW = datetime.now(UTC)
 class MockProvider(FootballProvider):
     """Returns hard-coded sample data. Used when no real API key is configured."""
 
-    LEAGUES: list[ProviderLeague] = [
+    LEAGUES: ClassVar[list[ProviderLeague]] = [
         ProviderLeague("mock-39", "Premier League", "England", "2024", None),
         ProviderLeague("mock-140", "La Liga", "Spain", "2024", None),
     ]
 
-    TEAMS: list[ProviderTeam] = [
+    TEAMS: ClassVar[list[ProviderTeam]] = [
         ProviderTeam("mock-50", "Manchester City", "MCI", "England", None, "mock-39"),
         ProviderTeam("mock-40", "Liverpool", "LIV", "England", None, "mock-39"),
         ProviderTeam("mock-42", "Arsenal", "ARS", "England", None, "mock-39"),

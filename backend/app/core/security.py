@@ -29,8 +29,8 @@ def decode_access_token(token: str, settings: Settings | None = None) -> str:
         if sub is None:
             raise _credentials_error()
         return sub
-    except JWTError:
-        raise _credentials_error()
+    except JWTError as err:
+        raise _credentials_error() from err
 
 
 def _credentials_error() -> HTTPException:

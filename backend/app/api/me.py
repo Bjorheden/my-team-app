@@ -31,6 +31,7 @@ router = APIRouter(prefix="/me", tags=["me"])
 
 # ── Helper ────────────────────────────────────────────────────────────────────
 
+
 async def _get_or_404(db: AsyncSession, user_id: str) -> User:
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
@@ -41,14 +42,13 @@ async def _get_or_404(db: AsyncSession, user_id: str) -> User:
 
 # ── Follows ───────────────────────────────────────────────────────────────────
 
+
 @router.get("/follows", response_model=list[FollowOut])
 async def list_follows(
     db: AsyncSession = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ) -> list[FollowOut]:
-    result = await db.execute(
-        select(Follow).options(selectinload(Follow.team)).where(Follow.user_id == user_id)
-    )
+    result = await db.execute(select(Follow).options(selectinload(Follow.team)).where(Follow.user_id == user_id))
     return [FollowOut.model_validate(f) for f in result.scalars().all()]
 
 
@@ -65,9 +65,7 @@ async def follow_team(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Team not found")
 
     # Idempotent: return existing follow
-    existing = await db.execute(
-        select(Follow).where(Follow.user_id == user_id, Follow.team_id == body.team_id)
-    )
+    existing = await db.execute(select(Follow).where(Follow.user_id == user_id, Follow.team_id == body.team_id))
     follow = existing.scalar_one_or_none()
     if follow:
         return FollowOut.model_validate(follow)
@@ -85,14 +83,13 @@ async def unfollow_team(
     db: AsyncSession = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ) -> OKResponse:
-    await db.execute(
-        delete(Follow).where(Follow.user_id == user_id, Follow.team_id == team_id)
-    )
+    await db.execute(delete(Follow).where(Follow.user_id == user_id, Follow.team_id == team_id))
     await cache_delete_pattern(f"dashboard:{user_id}:*")
     return OKResponse()
 
 
 # ── Dashboard ─────────────────────────────────────────────────────────────────
+
 
 @router.get("/dashboard", response_model=list[DashboardTeamEntry])
 async def dashboard(
@@ -159,14 +156,13 @@ async def dashboard(
 
 # ── Notification preferences ──────────────────────────────────────────────────
 
+
 @router.get("/notification-preferences", response_model=list[NotificationPreferenceOut])
 async def get_notification_prefs(
     db: AsyncSession = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ) -> list[NotificationPreferenceOut]:
-    result = await db.execute(
-        select(NotificationPreference).where(NotificationPreference.user_id == user_id)
-    )
+    result = await db.execute(select(NotificationPreference).where(NotificationPreference.user_id == user_id))
     return [NotificationPreferenceOut.model_validate(p) for p in result.scalars().all()]
 
 
@@ -201,6 +197,7 @@ async def upsert_notification_prefs(
 
 
 # ── Push tokens ───────────────────────────────────────────────────────────────
+
 
 @router.post("/push-tokens", response_model=PushTokenOut, status_code=status.HTTP_201_CREATED)
 async def register_push_token(

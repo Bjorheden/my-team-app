@@ -26,10 +26,7 @@ async def search_teams(
 ) -> PaginatedResponse[TeamWithLeagueOut]:
     """Search teams by name. Checks local DB first, falls back to provider."""
     result = await db.execute(
-        select(Team)
-        .options(selectinload(Team.league))
-        .where(Team.name.ilike(f"%{q}%"))
-        .limit(limit)
+        select(Team).options(selectinload(Team.league)).where(Team.name.ilike(f"%{q}%")).limit(limit)
     )
     teams = result.scalars().all()
 

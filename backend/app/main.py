@@ -22,6 +22,7 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     from app.core.logging import get_logger
+
     log = get_logger()
     log.info(
         "MyTeams API starting",

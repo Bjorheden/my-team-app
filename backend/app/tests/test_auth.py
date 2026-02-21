@@ -48,6 +48,7 @@ async def test_magic_link_full_flow(client: AsyncClient) -> None:
 
     # 2. Grab the token from the in-memory store (only possible in tests)
     from app.api.auth import _pending_tokens
+
     token = next(iter(_pending_tokens))
 
     # 3. verify

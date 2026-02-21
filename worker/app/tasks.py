@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
-import logging
-
 import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -23,36 +20,36 @@ def _get_provider() -> object:
     settings = get_worker_settings()
     if settings.provider_api_key and settings.provider_name == "api_football":
         from app.provider_adapters.api_football import ApiFootballProvider  # type: ignore[import]
+
         return ApiFootballProvider(
             api_key=settings.provider_api_key,
             base_url=settings.provider_base_url or "https://v3.football.api-sports.io",
         )
     from app.provider_adapters.mock import MockProvider  # type: ignore[import]
+
     return MockProvider()
 
 
 # ── Individual sync tasks ─────────────────────────────────────────────────────
 
+
 async def sync_fixtures_task() -> None:
     """Sync upcoming and recent fixtures for all tracked teams."""
-    from datetime import UTC, datetime, timedelta
-
     settings = get_worker_settings()
     factory = _make_session_factory(settings.database_url)
     provider = _get_provider()
 
     async with factory() as session:
-        from sqlalchemy.orm import DeclarativeBase
-
         # Import DB models from the shared layer
         # Worker re-uses backend models by having them importable via PYTHONPATH
         try:
-            from app.db_models import Team, Fixture  # type: ignore[import]
+            from app.db_models import Team  # type: ignore[import]
         except ImportError:
             log.warning("DB models not importable – skipping fixture sync")
             return
 
         from app.sync_helper import SyncService  # type: ignore[import]
+
         svc = SyncService(provider, session)  # type: ignore[arg-type]
 
         teams_result = await session.execute(select(Team))

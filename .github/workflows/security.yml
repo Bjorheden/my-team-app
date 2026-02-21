@@ -35,6 +35,7 @@ jobs:
           sarif_file: trivy-fs.sarif
           category: filesystem
         if: always()
+        continue-on-error: true
 
   trivy-backend-image:
     name: Trivy backend image scan
@@ -72,6 +73,7 @@ jobs:
           sarif_file: trivy-backend.sarif
           category: backend-image
         if: always()
+        continue-on-error: true
 
   trivy-worker-image:
     name: Trivy worker image scan
@@ -108,4 +110,6 @@ jobs:
         with:
           sarif_file: trivy-worker.sarif
           category: worker-image
+        if: always()
+        continue-on-error: true
         if: always()

@@ -144,7 +144,7 @@ export default function SearchScreen() {
         )}
         ListEmptyComponent={
           debouncedQuery.length > 0 && !isLoading ? (
-            <Text style={styles.hint}>No teams found for "{debouncedQuery}"</Text>
+            <Text style={styles.hint}>{`No teams found for "${debouncedQuery}"`}</Text>
           ) : null
         }
       />

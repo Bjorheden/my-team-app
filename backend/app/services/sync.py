@@ -27,9 +27,7 @@ class SyncService:
         provider_leagues = await self.provider.get_leagues(country=country, season=season)
         count = 0
         for pl in provider_leagues:
-            existing = await self.session.execute(
-                select(League).where(League.provider_league_id == pl.provider_id)
-            )
+            existing = await self.session.execute(select(League).where(League.provider_league_id == pl.provider_id))
             league = existing.scalar_one_or_none()
             if league is None:
                 league = League(
@@ -52,17 +50,13 @@ class SyncService:
     # ── Teams ─────────────────────────────────────────────────────────────────
     async def sync_teams(self, league_provider_id: str) -> int:
         # Ensure league exists
-        league_row = await self.session.execute(
-            select(League).where(League.provider_league_id == league_provider_id)
-        )
+        league_row = await self.session.execute(select(League).where(League.provider_league_id == league_provider_id))
         league = league_row.scalar_one_or_none()
 
         provider_teams = await self.provider.get_teams(league_provider_id)
         count = 0
         for pt in provider_teams:
-            existing = await self.session.execute(
-                select(Team).where(Team.provider_team_id == pt.provider_id)
-            )
+            existing = await self.session.execute(select(Team).where(Team.provider_team_id == pt.provider_id))
             team = existing.scalar_one_or_none()
             if team is None:
                 team = Team(
@@ -103,21 +97,15 @@ class SyncService:
             select(League).where(League.provider_league_id == pf.league_provider_id)
         )
         league = league_row.scalar_one_or_none()
-        home_row = await self.session.execute(
-            select(Team).where(Team.provider_team_id == pf.home_team_provider_id)
-        )
-        away_row = await self.session.execute(
-            select(Team).where(Team.provider_team_id == pf.away_team_provider_id)
-        )
+        home_row = await self.session.execute(select(Team).where(Team.provider_team_id == pf.home_team_provider_id))
+        away_row = await self.session.execute(select(Team).where(Team.provider_team_id == pf.away_team_provider_id))
         home_team = home_row.scalar_one_or_none()
         away_team = away_row.scalar_one_or_none()
 
         if not (league and home_team and away_team):
             return 0
 
-        existing = await self.session.execute(
-            select(Fixture).where(Fixture.provider_fixture_id == pf.provider_id)
-        )
+        existing = await self.session.execute(select(Fixture).where(Fixture.provider_fixture_id == pf.provider_id))
         fixture = existing.scalar_one_or_none()
         if fixture is None:
             fixture = Fixture(
@@ -156,9 +144,7 @@ class SyncService:
         for pe in provider_events:
             team: Team | None = None
             if pe.team_provider_id:
-                team_row = await self.session.execute(
-                    select(Team).where(Team.provider_team_id == pe.team_provider_id)
-                )
+                team_row = await self.session.execute(select(Team).where(Team.provider_team_id == pe.team_provider_id))
                 team = team_row.scalar_one_or_none()
 
             new_event = Event(
@@ -181,50 +167,50 @@ class SyncService:
     # ── Standings ─────────────────────────────────────────────────────────────
     async def sync_standings(self, league_provider_id: str, season: str) -> int:
         provider_standings = await self.provider.get_standings(league_provider_id, season)
-        league_row = await self.session.execute(
-            select(League).where(League.provider_league_id == league_provider_id)
-        )
+        league_row = await self.session.execute(select(League).where(League.provider_league_id == league_provider_id))
         league = league_row.scalar_one_or_none()
         if not league:
             return 0
 
         count = 0
         for ps in provider_standings:
-            team_row = await self.session.execute(
-                select(Team).where(Team.provider_team_id == ps.team_provider_id)
-            )
+            team_row = await self.session.execute(select(Team).where(Team.provider_team_id == ps.team_provider_id))
             team = team_row.scalar_one_or_none()
             if not team:
                 continue
 
-            stmt = pg_insert(Standing).values(
-                league_id=league.id,
-                season=ps.season,
-                team_id=team.id,
-                rank=ps.rank,
-                played=ps.played,
-                wins=ps.wins,
-                draws=ps.draws,
-                losses=ps.losses,
-                goals_for=ps.goals_for,
-                goals_against=ps.goals_against,
-                goal_diff=ps.goal_diff,
-                points=ps.points,
-                updated_at=datetime.now(UTC),
-            ).on_conflict_do_update(
-                index_elements=["league_id", "season", "team_id"],
-                set_={
-                    "rank": ps.rank,
-                    "played": ps.played,
-                    "wins": ps.wins,
-                    "draws": ps.draws,
-                    "losses": ps.losses,
-                    "goals_for": ps.goals_for,
-                    "goals_against": ps.goals_against,
-                    "goal_diff": ps.goal_diff,
-                    "points": ps.points,
-                    "updated_at": datetime.now(UTC),
-                },
+            stmt = (
+                pg_insert(Standing)
+                .values(
+                    league_id=league.id,
+                    season=ps.season,
+                    team_id=team.id,
+                    rank=ps.rank,
+                    played=ps.played,
+                    wins=ps.wins,
+                    draws=ps.draws,
+                    losses=ps.losses,
+                    goals_for=ps.goals_for,
+                    goals_against=ps.goals_against,
+                    goal_diff=ps.goal_diff,
+                    points=ps.points,
+                    updated_at=datetime.now(UTC),
+                )
+                .on_conflict_do_update(
+                    index_elements=["league_id", "season", "team_id"],
+                    set_={
+                        "rank": ps.rank,
+                        "played": ps.played,
+                        "wins": ps.wins,
+                        "draws": ps.draws,
+                        "losses": ps.losses,
+                        "goals_for": ps.goals_for,
+                        "goals_against": ps.goals_against,
+                        "goal_diff": ps.goal_diff,
+                        "points": ps.points,
+                        "updated_at": datetime.now(UTC),
+                    },
+                )
             )
             await self.session.execute(stmt)
             count += 1

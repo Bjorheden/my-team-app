@@ -63,6 +63,7 @@ async def trigger_sync(
 
     else:
         from fastapi import HTTPException, status
+
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown scope: {body.scope}. Use: fixtures, standings, events",

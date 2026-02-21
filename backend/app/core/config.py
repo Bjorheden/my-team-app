@@ -41,9 +41,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
 
     # ── Database ─────────────────────────────────────────────────
-    database_url: str = Field(
-        default="postgresql+asyncpg://myteams:myteams_secret@localhost:5432/myteams"
-    )
+    database_url: str = Field(default="postgresql+asyncpg://myteams:myteams_secret@localhost:5432/myteams")
 
     # ── Redis ────────────────────────────────────────────────────
     redis_url: str = Field(default="redis://localhost:6379/0")

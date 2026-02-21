@@ -44,10 +44,7 @@ class MockProvider(FootballProvider):
             ProviderFixture("mock-fix-1002", "mock-39", "2024", "mock-42", "mock-50", tomorrow, "NS"),
             ProviderFixture("mock-fix-1003", "mock-140", "2024", "mock-541", "mock-529", next_week, "NS"),
         ]
-        return [
-            f for f in all_fixtures
-            if f.home_team_provider_id == team_id or f.away_team_provider_id == team_id
-        ]
+        return [f for f in all_fixtures if f.home_team_provider_id == team_id or f.away_team_provider_id == team_id]
 
     async def get_leagues(self, country: str | None = None, season: str | None = None) -> list[ProviderLeague]:
         leagues = self.LEAGUES
@@ -68,10 +65,7 @@ class MockProvider(FootballProvider):
     async def get_fixtures(
         self, team_provider_id: str, from_date: datetime, to_date: datetime
     ) -> list[ProviderFixture]:
-        return [
-            f for f in self._fixtures_for_team(team_provider_id)
-            if from_date <= f.start_time <= to_date
-        ]
+        return [f for f in self._fixtures_for_team(team_provider_id) if from_date <= f.start_time <= to_date]
 
     async def get_events(self, fixture_provider_id: str) -> list[ProviderEvent]:
         if fixture_provider_id == "mock-fix-1001":

@@ -29,11 +29,13 @@ class Base(DeclarativeBase):
 
 # ── UUID PK helper ─────────────────────────────────────────────────────────────
 
+
 def uuid_pk() -> str:
     return str(uuid.uuid4())
 
 
 # ── Models ────────────────────────────────────────────────────────────────────
+
 
 class User(Base):
     __tablename__ = "users"
@@ -72,9 +74,7 @@ class Team(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_pk)
     provider_team_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(255))
-    league_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("leagues.id"), nullable=True, index=True
-    )
+    league_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("leagues.id"), nullable=True, index=True)
     country: Mapped[str | None] = mapped_column(String(100), nullable=True)
     logo_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     short_name: Mapped[str | None] = mapped_column(String(50), nullable=True)

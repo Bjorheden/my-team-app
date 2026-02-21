@@ -13,7 +13,6 @@ Start with:   python -m app.main
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import signal
 import sys
@@ -38,9 +37,7 @@ def _configure_logging() -> None:
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.JSONRenderer(),
         ],
-        wrapper_class=structlog.make_filtering_bound_logger(
-            getattr(logging, settings.log_level.upper(), logging.INFO)
-        ),
+        wrapper_class=structlog.make_filtering_bound_logger(getattr(logging, settings.log_level.upper(), logging.INFO)),
         logger_factory=structlog.PrintLoggerFactory(sys.stdout),
     )
 
@@ -54,6 +51,7 @@ def _get_redis() -> Redis:  # type: ignore[type-arg]
 
 # ── RQ Worker process ─────────────────────────────────────────────────────────
 
+
 def _run_rq_worker() -> None:
     """Run the RQ worker (blocking). Called in a subprocess."""
     _configure_logging()
@@ -66,9 +64,9 @@ def _run_rq_worker() -> None:
 # ── Scheduler loop ────────────────────────────────────────────────────────────
 
 SYNC_TASKS = [
-    ("app.tasks.sync_fixtures_task", 300),       # every 5 min
-    ("app.tasks.sync_standings_task", 1800),     # every 30 min
-    ("app.tasks.sync_live_events_task", 60),     # every 1 min
+    ("app.tasks.sync_fixtures_task", 300),  # every 5 min
+    ("app.tasks.sync_standings_task", 1800),  # every 30 min
+    ("app.tasks.sync_live_events_task", 60),  # every 1 min
 ]
 
 
@@ -94,6 +92,7 @@ def _run_scheduler() -> None:
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
+
 
 def main() -> None:
     _configure_logging()

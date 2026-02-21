@@ -102,7 +102,7 @@ export default function DashboardScreen() {
       {!data || data.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.emptyText}>
-            You're not following any teams yet.{"\n"}Use Search to find your teams!
+            {"You're not following any teams yet.\nUse Search to find your teams!"}
           </Text>
         </View>
       ) : (
